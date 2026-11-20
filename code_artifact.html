@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>九年級健教《我們這一家》互動數位學習單</title>
+  <!-- 載入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 載入 Google Fonts: Noto Sans TC & Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans TC', 'Inter', sans-serif;
+      background-color: #FAF7F2;
+      color: #1E293B;
+      overflow-x: hidden;
+    }
+    .card-shadow {
+      box-shadow: 0 10px 25px -5px rgba(30, 41, 59, 0.06), 0 8px 10px -6px rgba(30, 41, 59, 0.04);
+    }
+    .fade-in {
+      animation: fadeIn 0.35s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* 自訂捲軸美化 */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #F1F5F9; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-teal-200 selection:text-teal-900">
+
+  <!-- 頂部導覽列：課程標題、計時器與教師小抄按鈕 -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 sm:px-6">
+    <div class="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-teal-600 text-white font-black text-lg shadow-sm">家</span>
+        <div>
+          <h1 class="text-base sm:text-lg font-extrabold text-slate-800 leading-tight">我們這一家｜互動數位學習單</h1>
+          <p class="text-xs text-slate-500 hidden sm:block">九年級健康教育・單元二第 2 章（課本 P.45–55）</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- 進行時間計時器 -->
+        <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-800 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold">
+          <span>⏱️ 已進行</span>
+          <span id="elapsed-timer" class="font-mono">00:00</span>
+        </div>
+        <!-- 教師備課／控場小抄按鈕 -->
+        <button onclick="openTeacherModal()" class="px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 active:scale-95 text-white text-xs sm:text-sm font-bold transition shadow-sm flex items-center gap-1">
+          <span>📋</span>
+          <span>教師小抄</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 進度步驟條 (Stepper) -->
+    <div id="stepper-bar" class="max-w-4xl mx-auto mt-3 pt-2 border-t border-stone-100 hidden">
+      <div class="grid grid-cols-4 gap-2 text-center text-xs sm:text-sm">
+        <div id="step-ind-1" class="py-1.5 px-2 rounded-lg font-bold bg-teal-600 text-white transition">1. 溝通心理測驗</div>
+        <div id="step-ind-2" class="py-1.5 px-2 rounded-lg font-medium bg-stone-100 text-slate-400 transition">2. 一日交換父母</div>
+        <div id="step-ind-3" class="py-1.5 px-2 rounded-lg font-medium bg-stone-100 text-slate-400 transition">3. 安全網闖關</div>
+        <div id="step-ind-4" class="py-1.5 px-2 rounded-lg font-medium bg-stone-100 text-slate-400 transition">4. 結算認證卡</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要內容容器 -->
+  <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6 sm:px-6 sm:py-8">
+
+    <!-- ==================== 歡迎與學生資料登入頁 ==================== -->
+    <section id="view-intro" class="fade-in">
+      <div class="bg-white rounded-3xl p-6 sm:p-10 card-shadow border border-stone-100">
+        <div class="inline-block px-3.5 py-1 rounded-full bg-teal-50 text-teal-700 font-bold text-xs sm:text-sm mb-4">
+          📱 平板個人任務模式・請保持安靜獨立完成
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-black text-slate-800 mb-3 leading-snug">
+          歡迎來到《我們這一家》<br class="sm:hidden">線上互動任務營！
+        </h2>
+        <p class="text-slate-600 text-base sm:text-lg mb-6 leading-relaxed">
+          今天這堂課不需要死背課本，請你跟著平板上的 <strong class="text-teal-700">4 個關卡</strong>，測出你的家庭溝通動物、體驗「跟爸媽交換靈魂」，最後系統會自動產生你的<strong class="text-amber-600">專屬成績認證卡</strong>（下課前舉手給老師看即可加分過關！）。
+        </p>
+
+        <!-- 任務總覽卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+          <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-100 flex items-start gap-3">
+            <span class="text-2xl">🦉</span>
+            <div>
+              <h3 class="font-bold text-slate-800">關卡一：溝通動物心理測驗</h3>
+              <p class="text-xs sm:text-sm text-slate-600">6 題生活情境，測出你在家的溝通風格</p>
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl bg-teal-50/70 border border-teal-100 flex items-start gap-3">
+            <span class="text-2xl">🔄</span>
+            <div>
+              <h3 class="font-bold text-slate-800">關卡二：一日「交換父母」體驗</h3>
+              <p class="text-xs sm:text-sm text-slate-600">靈魂互換！破解倒垃圾衝突與高情商翻譯</p>
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl bg-rose-50/70 border border-rose-100 flex items-start gap-3">
+            <span class="text-2xl">🛡️</span>
+            <div>
+              <h3 class="font-bold text-slate-800">關卡三：家庭安全網守護認證</h3>
+              <p class="text-xs sm:text-sm text-slate-600">4 題實戰快問快答，辨識隱形家暴與自救</p>
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex items-start gap-3">
+            <span class="text-2xl">🏆</span>
+            <div>
+              <h3 class="font-bold text-slate-800">關卡四：微行動＆結算憑證</h3>
+              <p class="text-xs sm:text-sm text-slate-600">立下本週小承諾，生成專屬結算畫面</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 學生基本資料表單 -->
+        <div class="bg-stone-50 rounded-2xl p-5 sm:p-6 border border-stone-200">
+          <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <span>✍️</span>
+            <span>請先輸入你的資料（將顯示於最終成績認證卡）</span>
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">班級（例如：901）</label>
+              <input id="stu-class" type="text" placeholder="請輸入班級" class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white text-base" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">座號（例如：15）</label>
+              <input id="stu-seat" type="number" placeholder="請輸入座號" class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white text-base" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">姓名</label>
+              <input id="stu-name" type="text" placeholder="請輸入姓名" class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white text-base" />
+            </div>
+          </div>
+          <p id="intro-error" class="text-rose-600 text-sm font-bold mt-3 hidden">⚠️ 請完整填寫「班級、座號、姓名」再開始闖關喔！</p>
+          <button onclick="startWorksheet()" class="mt-6 w-full py-4 rounded-2xl bg-teal-600 hover:bg-teal-700 active:scale-[0.99] text-white font-black text-lg shadow-md transition flex items-center justify-center gap-2">
+            <span>開始進行關卡一：心理測驗</span>
+            <span>➔</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 關卡一：心理測驗 ==================== -->
+    <section id="view-stage1" class="hidden fade-in">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-stone-100">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-bold text-xs sm:text-sm">關卡一（約 8 分鐘）｜課本 P.46–48</span>
+          <span class="text-xs sm:text-sm text-slate-500 font-medium">請依直覺選出最符合你平時反應的選項</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">【心理測驗】你的家庭溝通風格是什麼動物？</h2>
+        <p class="text-slate-600 mb-6">完成下方 6 題情境題，測出你在家裡的「溝通動物人格」與目前家庭氣氛分析！</p>
+
+        <!-- 6 題測驗列表 -->
+        <div id="quiz-questions-container" class="space-y-6"></div>
+
+        <p id="stage1-error" class="text-rose-600 text-sm font-bold mt-4 hidden">⚠️ 還有題目尚未作答，請檢查上方 6 題是否都已點選！</p>
+
+        <button id="btn-calc-quiz" onclick="calculateQuizResult()" class="mt-8 w-full py-4 rounded-2xl bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white font-black text-lg shadow-md transition">
+          ✨ 揭曉我的家庭溝通動物！
+        </button>
+
+        <!-- 心理測驗結果卡片 -->
+        <div id="quiz-result-box" class="hidden mt-8 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-teal-50 to-amber-50 border-2 border-teal-200 fade-in">
+          <div class="flex flex-col sm:flex-row items-center gap-6">
+            <div id="result-animal-emoji" class="w-24 h-24 rounded-3xl bg-white shadow-md flex items-center justify-center text-6xl shrink-0">🦉</div>
+            <div class="text-center sm:text-left">
+              <span class="inline-block px-3 py-1 rounded-full bg-teal-600 text-white text-xs font-bold mb-2">你的家庭溝通動物圖鑑</span>
+              <h3 id="result-animal-title" class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">冷靜貓頭鷹型</h3>
+              <p id="result-animal-desc" class="text-slate-700 leading-relaxed mb-3"></p>
+              <div class="p-3.5 rounded-xl bg-white/80 border border-teal-100 text-sm text-slate-700">
+                <strong class="text-teal-700">💡 課本 P.47 溝通加溫處方籤：</strong>
+                <span id="result-animal-tip"></span>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="goToStage(2)" class="mt-6 w-full py-4 rounded-2xl bg-teal-600 hover:bg-teal-700 active:scale-[0.99] text-white font-black text-lg shadow-md transition">
+            進入關卡二：一日「交換父母」體驗營 ➔
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 關卡二：一日「交換父母」體驗營 ==================== -->
+    <section id="view-stage2" class="hidden fade-in">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-stone-100">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <span class="px-3 py-1 rounded-full bg-teal-100 text-teal-800 font-bold text-xs sm:text-sm">關卡二（約 12 分鐘）｜課本 P.48–50</span>
+          <span class="text-xs sm:text-sm text-slate-500 font-medium">靈魂互換角色扮演任務</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-3">【角色扮演】一日「交換父母」體驗營</h2>
+
+        <!-- 情境前導漫畫卡片 -->
+        <div class="p-5 rounded-2xl bg-slate-800 text-white mb-6">
+          <div class="flex items-center gap-2 text-amber-400 font-bold text-sm mb-2">
+            <span>⚡ 突發事件：你與爸媽交換靈魂了！</span>
+          </div>
+          <p class="text-sm sm:text-base text-slate-200 leading-relaxed mb-4">
+            晚上 7 點半，你剛上完一整天的班（或忙完家事）回到客廳，看到孩子躺在沙發上邊滑手機邊吃零食，垃圾袋還滿出來躺在地上。你忍不住脫口而出：<strong class="text-amber-300">「不要回家就只會玩手機，趕快幫忙倒垃圾！」</strong><br>
+            結果孩子回嘴：<strong class="text-rose-300">「我就不能放鬆一下？姊姊整天在家怎麼不叫她去倒？」</strong>
+          </p>
+          <div class="text-xs text-slate-400 bg-slate-900/60 p-3 rounded-xl">
+            📌 任務目標：現在你就是那位家長！請利用課本 P.49–50「問題解決 5 步驟」完成以下三個換位任務。
+          </div>
+        </div>
+
+        <!-- 任務 2-1：讀心術解鎖（STEP 1 & 2 釐清問題與需求） -->
+        <div class="mb-8">
+          <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-teal-600 text-white text-sm flex items-center justify-center">1</span>
+            <span>換位讀心術：點擊卡片翻開「怒火背後的真實感受」（課本 P.49）</span>
+          </h3>
+          <p class="text-sm text-slate-600 mb-3">請點擊下方兩張角色卡片，解鎖雙方沒說出口的真實想法：</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button type="button" id="flip-parent" onclick="revealPerspective('parent')" class="p-5 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/50 hover:bg-amber-50 text-left transition">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-black text-amber-900 text-base">👨 家長（現在的你）內心 OS</span>
+                <span id="flip-parent-badge" class="text-xs px-2.5 py-1 rounded-full bg-amber-200 text-amber-900 font-bold">點擊解鎖</span>
+              </div>
+              <p id="flip-parent-text" class="text-sm text-slate-500">（點此查看家長生氣背後的真正情緒與期望...）</p>
+            </button>
+
+            <button type="button" id="flip-kid" onclick="revealPerspective('kid')" class="p-5 rounded-2xl border-2 border-dashed border-teal-300 bg-teal-50/50 hover:bg-teal-50 text-left transition">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-black text-teal-900 text-base">👧 孩子（原來的你）內心 OS</span>
+                <span id="flip-kid-badge" class="text-xs px-2.5 py-1 rounded-full bg-teal-200 text-teal-900 font-bold">點擊解鎖</span>
+              </div>
+              <p id="flip-kid-text" class="text-sm text-slate-500">（點此查看孩子滑手機背後的真正情緒與期望...）</p>
+            </button>
+          </div>
+        </div>
+
+        <!-- 任務 2-2：高情商翻譯機（STEP 3 & 4 評估方案與凝結共識） -->
+        <div class="mb-8">
+          <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-teal-600 text-white text-sm flex items-center justify-center">2</span>
+            <span>高情商翻譯機：選出一句最能「凝結共識」的回應（課本 P.48 & P.50）</span>
+          </h3>
+          <p class="text-sm text-slate-600 mb-3">課本 P.48 提醒我們要避開「批評指責、侮辱疏視、防衛、冷漠」。如果重來一次，身為家長的你怎麼說最有效？</p>
+          <div class="space-y-2.5" id="empathy-options">
+            <label class="block p-4 rounded-xl border border-stone-200 hover:border-teal-400 cursor-pointer transition bg-stone-50/50">
+              <input type="radio" name="s2_comm" value="bad1" onchange="checkCommChoice(this.value)" class="mr-2.5 accent-teal-600">
+              <span class="font-medium text-slate-700">「三歲小孩都比你會挑時間！整天只會滑手機，書都不用念了嗎？」</span>
+            </label>
+            <label class="block p-4 rounded-xl border border-stone-200 hover:border-teal-400 cursor-pointer transition bg-stone-50/50">
+              <input type="radio" name="s2_comm" value="good" onchange="checkCommChoice(this.value)" class="mr-2.5 accent-teal-600">
+              <span class="font-medium text-slate-700">「我知道你剛放學想休息，給你 15 分鐘滑手機，8 點前幫忙拿去倒；明天換姊姊倒，好嗎？」</span>
+            </label>
+            <label class="block p-4 rounded-xl border border-stone-200 hover:border-teal-400 cursor-pointer transition bg-stone-50/50">
+              <input type="radio" name="s2_comm" value="bad2" onchange="checkCommChoice(this.value)" class="mr-2.5 accent-teal-600">
+              <span class="font-medium text-slate-700">（直接翻白眼摔門進房間，接下來三天都不跟孩子講話）</span>
+            </label>
+          </div>
+          <div id="s2-comm-feedback" class="hidden mt-3 p-3.5 rounded-xl text-sm font-medium"></div>
+        </div>
+
+        <!-- 任務 2-3：靈魂互換許願池（個人手寫思考） -->
+        <div class="bg-stone-50 p-5 sm:p-6 rounded-2xl border border-stone-200">
+          <h3 class="text-lg font-extrabold text-slate-800 mb-3 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-teal-600 text-white text-sm flex items-center justify-center">3</span>
+            <span>靈魂互換許願單（請寫下你的真實想法）</span>
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">🔄 站在爸媽角度想：「如果我是我爸媽，我最希望孩子做到的一件事是…」</label>
+              <input id="swap-parent-wish" type="text" placeholder="例如：回家先主動把書包收好、吃飯時不要一直滑手機..." class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white text-sm sm:text-base" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">💬 回到自己角度說：「如果爸媽變成我，我最希望他們理解的一件事是…」</label>
+              <input id="swap-kid-wish" type="text" placeholder="例如：九年級考試壓力很大，回家滑手機只是想放空 15 分鐘..." class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white text-sm sm:text-base" />
+            </div>
+          </div>
+        </div>
+
+        <p id="stage2-error" class="text-rose-600 text-sm font-bold mt-4 hidden">⚠️ 請先完成上方的「卡片解鎖」、「高情商選擇」與「兩格許願單填寫」喔！</p>
+
+        <div class="mt-8 flex gap-3">
+          <button onclick="goToStage(1)" class="px-5 py-4 rounded-2xl bg-stone-200 hover:bg-stone-300 text-slate-700 font-bold transition">← 上一關</button>
+          <button onclick="completeStage2()" class="flex-1 py-4 rounded-2xl bg-teal-600 hover:bg-teal-700 active:scale-[0.99] text-white font-black text-lg shadow-md transition">
+            完成體驗，前往關卡三：安全網闖關 ➔
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 關卡三：家庭安全網與守護者認證 ==================== -->
+    <section id="view-stage3" class="hidden fade-in">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-stone-100">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 font-bold text-xs sm:text-sm">關卡三（約 10 分鐘）｜課本 P.51–54</span>
+          <span class="text-xs sm:text-sm text-slate-500 font-medium">即時批改・全部作答完即可過關</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">【情境闖關】家庭安全網與守護者認證</h2>
+        <p class="text-slate-600 mb-6">衝突失控可能演變成家庭暴力（臺灣每年超過 10 萬件通報）。請挑戰以下 4 道守護者實戰題！</p>
+
+        <div id="safety-quiz-container" class="space-y-6"></div>
+
+        <p id="stage3-error" class="text-rose-600 text-sm font-bold mt-4 hidden">⚠️ 請完成全部 4 道情境題的點選再繼續喔！</p>
+
+        <div class="mt-8 flex gap-3">
+          <button onclick="goToStage(2)" class="px-5 py-4 rounded-2xl bg-stone-200 hover:bg-stone-300 text-slate-700 font-bold transition">← 上一關</button>
+          <button onclick="completeStage3()" class="flex-1 py-4 rounded-2xl bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white font-black text-lg shadow-md transition">
+            領取守護者分數，前往最後結算 ➔
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 關卡四：個人微行動＆成績認證卡 ==================== -->
+    <section id="view-stage4" class="hidden fade-in">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-stone-100">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 font-bold text-xs sm:text-sm">關卡四（約 8 分鐘）｜課本 P.47 & P.55</span>
+          <span class="text-xs sm:text-sm text-slate-500 font-medium">最後一步・生成個人完成憑證</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">【最終任務】我的家庭微行動承諾</h2>
+        <p class="text-slate-600 mb-6">對照課本 P.47「增進家人關係四招」（表達感謝、分擔家務、參與活動、營造氣氛），選一個這週你願意嘗試的小行動！</p>
+
+        <div class="bg-indigo-50/60 p-5 sm:p-6 rounded-2xl border border-indigo-100 mb-6">
+          <label class="block text-sm font-bold text-slate-800 mb-2">1. 我想選擇的加溫行動類型：</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
+            <button type="button" onclick="selectActionCategory(this, '表達感謝與關懷')" class="action-cat-btn p-3 rounded-xl border border-stone-300 bg-white text-sm font-bold text-slate-700 hover:border-indigo-500 transition">💌 表達感謝</button>
+            <button type="button" onclick="selectActionCategory(this, '主動分擔家務')" class="action-cat-btn p-3 rounded-xl border border-stone-300 bg-white text-sm font-bold text-slate-700 hover:border-indigo-500 transition">🧹 分擔家務</button>
+            <button type="button" onclick="selectActionCategory(this, '一起參與活動')" class="action-cat-btn p-3 rounded-xl border border-stone-300 bg-white text-sm font-bold text-slate-700 hover:border-indigo-500 transition">🚶 參與活動</button>
+            <button type="button" onclick="selectActionCategory(this, '營造良好氣氛')" class="action-cat-btn p-3 rounded-xl border border-stone-300 bg-white text-sm font-bold text-slate-700 hover:border-indigo-500 transition">😊 營造氣氛</button>
+          </div>
+
+          <label class="block text-sm font-bold text-slate-800 mb-1">2. 寫下具體做法（一句話即可）：</label>
+          <input id="final-action-text" type="text" placeholder="例如：今晚吃飯時把手機放客廳充電、主動幫忙倒垃圾並說辛苦了..." class="w-full px-4 py-3 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-base" />
+        </div>
+
+        <p id="stage4-error" class="text-rose-600 text-sm font-bold mb-4 hidden">⚠️ 請選擇一個「行動類型」並寫下「具體做法」喔！</p>
+
+        <button onclick="generateCertificate()" class="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-black text-lg shadow-lg transition">
+          🎉 生成我的《我們這一家》成績認證卡！
+        </button>
+
+        <!-- ==================== 最終成績認證卡 (截圖／舉手給老師看) ==================== -->
+        <div id="certificate-card" class="hidden mt-8 fade-in">
+          <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 text-white p-6 sm:p-8 shadow-2xl border-4 border-amber-400">
+            <!-- 完成印章裝飾 -->
+            <div class="absolute top-4 right-4 sm:top-6 sm:right-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-amber-400/80 flex flex-col items-center justify-center rotate-12 bg-amber-400/10 backdrop-blur-sm">
+              <span class="text-xs font-bold text-amber-300">健教認證</span>
+              <span class="text-lg sm:text-xl font-black text-amber-400">已過關</span>
+            </div>
+
+            <p class="text-amber-400 font-bold text-xs sm:text-sm tracking-wider mb-1">九年級健康教育｜單元二第 2 章（P.45–55）</p>
+            <h3 class="text-2xl sm:text-3xl font-black mb-4">《我們這一家》數位學習單憑證</h3>
+
+            <!-- 學生基本資訊欄 -->
+            <div class="inline-flex flex-wrap items-center gap-3 bg-white/10 px-4 py-2 rounded-xl text-sm sm:text-base font-bold mb-6">
+              <span>班級：<span id="cert-class" class="text-amber-300"></span></span>
+              <span>｜</span>
+              <span>座號：<span id="cert-seat" class="text-amber-300"></span></span>
+              <span>｜</span>
+              <span>姓名：<span id="cert-name" class="text-amber-300"></span></span>
+            </div>
+
+            <!-- 四關學習成果摘要 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-sm mb-6">
+              <div class="bg-white/10 rounded-2xl p-4">
+                <span class="text-xs text-teal-300 font-bold block mb-1">🦉 關卡一｜溝通動物人格</span>
+                <p id="cert-animal" class="font-extrabold text-base text-white"></p>
+              </div>
+              <div class="bg-white/10 rounded-2xl p-4">
+                <span class="text-xs text-rose-300 font-bold block mb-1">🛡️ 關卡三｜安全網守護測驗</span>
+                <p id="cert-safety-score" class="font-extrabold text-base text-white"></p>
+              </div>
+              <div class="bg-white/10 rounded-2xl p-4 sm:col-span-2">
+                <span class="text-xs text-amber-300 font-bold block mb-1">🔄 關卡二｜交換父母換位思考</span>
+                <p class="text-slate-200 text-xs sm:text-sm mb-1">・爸媽希望我：<span id="cert-parent-wish" class="text-white font-bold"></span></p>
+                <p class="text-slate-200 text-xs sm:text-sm">・我希望爸媽理解：<span id="cert-kid-wish" class="text-white font-bold"></span></p>
+              </div>
+              <div class="bg-teal-500/20 border border-teal-400/40 rounded-2xl p-4 sm:col-span-2">
+                <span class="text-xs text-teal-300 font-bold block mb-1">🌱 關卡四｜本週家庭微行動（<span id="cert-action-cat"></span>）</span>
+                <p id="cert-action-text" class="font-bold text-white text-sm sm:text-base"></p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-4 border-t border-white/15 text-xs text-slate-300">
+              <span>完成時間：<span id="cert-timestamp" class="font-mono text-white"></span></span>
+              <span class="bg-amber-400 text-slate-900 font-black px-3 py-1 rounded-full">🙋‍♂️ 請舉手或截圖給老師確認！</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 頁尾 -->
+  <footer class="text-center text-xs text-slate-400 py-4 px-4">
+    九年級健康教育《我們這一家》數位互動學習單・搭配翰林／康軒／南一版家庭關係單元使用
+  </footer>
+
+  <!-- ==================== 教師備課／控場小抄 Modal ==================== -->
+  <div id="teacher-modal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[88vh] overflow-y-auto p-6 sm:p-8 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 border-b border-stone-200 mb-4">
+        <div>
+          <span class="text-xs font-bold text-teal-600 uppercase tracking-wider">Substitute Teacher Guide</span>
+          <h3 class="text-xl sm:text-2xl font-black text-slate-800">📋 45 分鐘代課老師「零講課」控場小抄</h3>
+        </div>
+        <button onclick="closeTeacherModal()" class="w-9 h-9 rounded-full bg-stone-100 hover:bg-stone-200 font-bold text-slate-600">✕</button>
+      </div>
+
+      <div class="space-y-4 text-sm sm:text-base text-slate-700">
+        <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+          <p class="font-bold text-amber-900 mb-1">💡 核心控場心法：全程個人操作、不開放分組討論</p>
+          <p class="text-xs sm:text-sm text-amber-800">只要讓學生各自戴耳機或安靜滑平板做心理測驗與填寫學習單，最後憑「完成憑證畫面」加分，九年級學生就會非常安靜且忙碌！</p>
+        </div>
+
+        <div class="space-y-3">
+          <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+            <span class="font-black text-teal-700">⏱️ 00–05 分鐘｜發平板＆輸入資料</span>
+            <p class="text-sm mt-1">老師台詞：「今天用平板做《我們這一家》線上心理測驗與交換父母學習單，全程安靜自己做，下課前秀出最後一張『認證卡』給我看就加平時成績！現在請輸入班級座號姓名。」</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+            <span class="font-black text-teal-700">⏱️ 05–15 分鐘｜關卡一：溝通動物心理測驗（P.46–48）</span>
+            <p class="text-sm mt-1">讓學生作答 6 題，測出自己是貓頭鷹、刺蝟、樹懶還是黃金獵犬（學生最愛看這種測驗結果，老師可偶爾抽問 1～2 位同學測出什麼動物）。</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+            <span class="font-black text-teal-700">⏱️ 15–28 分鐘｜關卡二：一日「交換父母」體驗營（P.48–50）</span>
+            <p class="text-sm mt-1">老師提醒：「現在請進入第二關，點擊翻開爸媽跟小孩的內心 OS，並寫下兩句靈魂互換許願單，不要寫太敷衍喔！」</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+            <span class="font-black text-teal-700">⏱️ 28–38 分鐘｜關卡三：家庭安全網闖關（P.51–54）</span>
+            <p class="text-sm mt-1">4 題家暴類型（摔手機算不算暴力）、證據保全與 113 專線快問快答，系統會自動批改並顯示解析，老師完全不用講解。</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+            <span class="font-black text-teal-700">⏱️ 38–45 分鐘｜關卡四：生成認證卡＆巡堂驗收（P.55）</span>
+            <p class="text-sm mt-1">學生填完最後一週微行動承諾後，螢幕會跳出深色金色邊框的「成績認證卡」。老師只需巡堂看螢幕、在點名單打勾即可完美下課！</p>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="closeTeacherModal()" class="mt-6 w-full py-3 rounded-xl bg-slate-800 text-white font-bold">我知道了，關閉小抄</button>
+    </div>
+  </div>
+
+  <!-- ==================== JavaScript 互動邏輯 ==================== -->
+  <script>
+    // 1. 計時器邏輯
+    let secondsElapsed = 0;
+    setInterval(() => {
+      secondsElapsed++;
+      const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+      const secs = String(secondsElapsed % 60).padStart(2, '0');
+      document.getElementById('elapsed-timer').textContent = `${mins}:${secs}`;
+    }, 1000);
+
+    // 教師小抄開關
+    function openTeacherModal() {
+      document.getElementById('teacher-modal').classList.remove('hidden');
+    }
+    function closeTeacherModal() {
+      document.getElementById('teacher-modal').classList.add('hidden');
+    }
+
+    // 儲存學生狀態
+    const studentState = {
+      className: '',
+      seat: '',
+      name: '',
+      animalTitle: '',
+      flippedParent: false,
+      flippedKid: false,
+      commSelected: '',
+      parentWish: '',
+      kidWish: '',
+      safetyScore: 0,
+      actionCategory: '',
+      actionText: ''
+    };
+
+    // 開始進入關卡一
+    function startWorksheet() {
+      const cls = document.getElementById('stu-class').value.trim();
+      const seat = document.getElementById('stu-seat').value.trim();
+      const name = document.getElementById('stu-name').value.trim();
+      const err = document.getElementById('intro-error');
+
+      if (!cls || !seat || !name) {
+        err.classList.remove('hidden');
+        return;
+      }
+      err.classList.add('hidden');
+      studentState.className = cls;
+      studentState.seat = seat;
+      studentState.name = name;
+
+      document.getElementById('stepper-bar').classList.remove('hidden');
+      goToStage(1);
+    }
+
+    // 切換關卡視圖與頂部 Stepper
+    function goToStage(stageNum) {
+      ['view-intro', 'view-stage1', 'view-stage2', 'view-stage3', 'view-stage4'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(`view-stage${stageNum}`).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      for (let i = 1; i <= 4; i++) {
+        const ind = document.getElementById(`step-ind-${i}`);
+        if (i === stageNum) {
+          ind.className = 'py-1.5 px-2 rounded-lg font-bold bg-teal-600 text-white transition shadow-sm';
+        } else if (i < stageNum) {
+          ind.className = 'py-1.5 px-2 rounded-lg font-bold bg-teal-100 text-teal-800 transition';
+        } else {
+          ind.className = 'py-1.5 px-2 rounded-lg font-medium bg-stone-100 text-slate-400 transition';
+        }
+      }
+    }
+
+    // ==================== 關卡一資料與渲染 ====================
+    const quizData = [
+      {
+        q: "1. 放學回家看到桌上已經擺好晚餐，你通常會怎麼做？（課本 P.46）",
+        options: [
+          { text: "A. 放下手機坐下來一起吃，順便聊幾句學校發生的事", type: "owl" },
+          { text: "B. 家人都在吃飯，但我還是忍不住邊吃邊滑手機", type: "sloth" },
+          { text: "C. 全家人圍在餐桌，但每個人都各自低頭看自己的手機", type: "sloth" },
+          { text: "D. 夾了菜或隨便吃兩口，不發一語直接回房間關門", type: "hedgehog" }
+        ]
+      },
+      {
+        q: "2. 影片正看到最精彩處，爸媽突然大喊「不要只會玩手機，去倒垃圾！」你的第一反應是？（課本 P.48）",
+        options: [
+          { text: "A. 立刻回嘴：「你都不公平！姊姊／弟弟整天在家怎麼不叫他去？」", type: "hedgehog" },
+          { text: "B. 戴上耳機假裝沒聽到，直接走回房間躲起來", type: "sloth" },
+          { text: "C. 深呼吸說：「好，這段看完剩 2 分鐘，我馬上拿去倒！」", type: "owl" },
+          { text: "D. 雖然心裡很煩，但還是邊碎念邊走去提垃圾袋", type: "retriever" }
+        ]
+      },
+      {
+        q: "3. 當你考試考差或心情很糟，家人卻在旁邊唸你時，你會怎麼回應？",
+        options: [
+          { text: "A. 爆炸反擊：「你們根本不懂我的壓力，不要再煩我了！」", type: "hedgehog" },
+          { text: "B. 沉默不語，問什麼都回「不知道、隨便、還好」", type: "sloth" },
+          { text: "C. 坦白說：「我這次也覺得很難過，先讓我冷靜一下再聊好嗎？」", type: "owl" },
+          { text: "D. 雖然委屈，但還是會跟家人撒嬌或尋求安慰", type: "retriever" }
+        ]
+      },
+      {
+        q: "4. 觀察你家目前的「整體氣氛」，最接近課本 P.46 的哪一種狀態？",
+        options: [
+          { text: "A. 彼此會聊天分享生活，遇到問題能好好講", type: "owl" },
+          { text: "B. 各自滑手機、各忙各的，其實很少真正交談", type: "sloth" },
+          { text: "C. 常常因為小事意見不合就吵起來，氣氛容易緊繃", type: "hedgehog" },
+          { text: "D. 雖然偶爾會鬥嘴，但很快就會和好，感情算不錯", type: "retriever" }
+        ]
+      },
+      {
+        q: "5. 對於「分擔家務」（洗碗、倒垃圾、曬衣服），你平時的態度是？（課本 P.47）",
+        options: [
+          { text: "A. 只要家人開口請我幫忙，大部分都會願意去做", type: "retriever" },
+          { text: "B. 覺得那是大人的事，被叫到才勉強動一下", type: "sloth" },
+          { text: "C. 會看誰做得多、誰做得少，覺得不公平就會抗議", type: "hedgehog" },
+          { text: "D. 有自己固定的負責項目，時間到就會自動完成", type: "owl" }
+        ]
+      },
+      {
+        q: "6. 如果要你對家人說一句「謝謝你」或寫一張感謝小卡，你的感覺是？（課本 P.46）",
+        options: [
+          { text: "A. 很自然啊，平常就會跟爸媽說謝謝或傳貼圖", type: "retriever" },
+          { text: "B. 當面講太肉麻了，但用傳訊息或寫紙條我可以", type: "owl" },
+          { text: "C. 覺得超尷尬，完全講不出口也不想寫", type: "sloth" },
+          { text: "D. 除非他們先對我好，不然我才不要主動示好", type: "hedgehog" }
+        ]
+      }
+    ];
+
+    const animalProfiles = {
+      owl: {
+        emoji: "🦉",
+        title: "冷靜貓頭鷹型（理性溝通大師）",
+        desc: "你擁有超齡的情緒覺察力！遇到家庭摩擦時，你比較能先踩煞車、說出自己的想法，也不容易被情緒牽著走，是家裡的穩定力量。",
+        tip: "試著在溝通時多加一點「溫度」，除了講道理，偶爾一句「辛苦了」會讓家人更窩心！"
+      },
+      retriever: {
+        emoji: "🐕",
+        title: "暖心黃金獵犬型（家庭氣氛潤滑劑）",
+        desc: "你很重視家人的感受，願意分擔家務也懂得適時表達感謝。就算家裡偶爾有小爭執，你也是最容易軟化氣氛、讓大家和好的人！",
+        tip: "照顧別人情緒的同時，也別忘了適時說出自己的疲憊與需求，不要總是自己委屈吞下去喔！"
+      },
+      hedgehog: {
+        emoji: "🦔",
+        title: "防禦刺蝟型（外剛內柔小戰士）",
+        desc: "其實你內心很在乎公平與被理解，但一感受到被指責或不被信任時，就會立刻豎起刺來「防衛反擊」（課本 P.48 常見地雷），讓家人誤以為你很叛逆。",
+        tip: "下次想頂嘴的前 3 秒，試著把「你都不公平！」換成「我現在有點累，10 分鐘後再做可以嗎？」效果會完全不同！"
+      },
+      sloth: {
+        emoji: "🦥",
+        title: "佛系樹懶型（省電冷漠隱形人）",
+        desc: "面對家人的碎念或衝突，你最習慣用「戴耳機、滑手機、回房間、說隨便」（課本 P.48 冷漠逃避）來保護自己。雖然表面沒吵架，但心與心的距離正悄悄變遠。",
+        tip: "每天只要撥出 5 分鐘放下手機，主動問家人一句「今天還好嗎？」，就能打破「最熟悉的陌生人」魔咒！"
+      }
+    };
+
+    function renderStage1Quiz() {
+      const container = document.getElementById('quiz-questions-container');
+      container.innerHTML = quizData.map((item, idx) => `
+        <div class="p-5 rounded-2xl bg-stone-50 border border-stone-200">
+          <p class="font-bold text-slate-800 text-base sm:text-lg mb-3">${item.q}</p>
+          <div class="space-y-2">
+            ${item.options.map((opt, oIdx) => `
+              <label class="flex items-center p-3.5 rounded-xl bg-white border border-stone-200 hover:border-amber-400 cursor-pointer transition">
+                <input type="radio" name="q_${idx}" value="${opt.type}" class="mr-3 w-4 h-4 accent-amber-500 shrink-0" />
+                <span class="text-sm sm:text-base text-slate-700">${opt.text}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+    renderStage1Quiz();
+
+    function calculateQuizResult() {
+      const counts = { owl: 0, retriever: 0, hedgehog: 0, sloth: 0 };
+      for (let i = 0; i < quizData.length; i++) {
+        const selected = document.querySelector(`input[name="q_${i}"]:checked`);
+        if (!selected) {
+          document.getElementById('stage1-error').classList.remove('hidden');
+          return;
+        }
+        counts[selected.value]++;
+      }
+      document.getElementById('stage1-error').classList.add('hidden');
+
+      // 找出最高分動物
+      let topType = 'owl';
+      let maxVal = -1;
+      for (const [k, v] of Object.entries(counts)) {
+        if (v > maxVal) {
+          maxVal = v;
+          topType = k;
+        }
+      }
+
+      const profile = animalProfiles[topType];
+      studentState.animalTitle = `${profile.emoji} ${profile.title}`;
+
+      document.getElementById('result-animal-emoji').textContent = profile.emoji;
+      document.getElementById('result-animal-title').textContent = profile.title;
+      document.getElementById('result-animal-desc').textContent = profile.desc;
+      document.getElementById('result-animal-tip').textContent = profile.tip;
+
+      const box = document.getElementById('quiz-result-box');
+      box.classList.remove('hidden');
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ==================== 關卡二互動邏輯 ====================
+    function revealPerspective(who) {
+      if (who === 'parent') {
+        studentState.flippedParent = true;
+        const card = document.getElementById('flip-parent');
+        card.className = 'p-5 rounded-2xl border-2 border-amber-400 bg-amber-50 text-left transition shadow-sm';
+        document.getElementById('flip-parent-badge').textContent = '✓ 已解鎖';
+        document.getElementById('flip-parent-text').innerHTML = '<strong class="text-amber-900">情緒：疲憊、焦急。</strong><br>真實期望：「垃圾車快來了，我忙了一整天很累，希望家人能主動分擔一點家事，而不是只有我在忙。」';
+      } else {
+        studentState.flippedKid = true;
+        const card = document.getElementById('flip-kid');
+        card.className = 'p-5 rounded-2xl border-2 border-teal-400 bg-teal-50 text-left transition shadow-sm';
+        document.getElementById('flip-kid-badge').textContent = '✓ 已解鎖';
+        document.getElementById('flip-kid-text').innerHTML = '<strong class="text-teal-900">情緒：委屈、覺得不公平。</strong><br>真實期望：「在學校上課一整天很累，剛回家想先滑手機放鬆一下，而且希望家事可以跟姊姊公平分配。」';
+      }
+    }
+
+    function checkCommChoice(val) {
+      studentState.commSelected = val;
+      const fb = document.getElementById('s2-comm-feedback');
+      fb.classList.remove('hidden');
+      if (val === 'good') {
+        fb.className = 'mt-3 p-3.5 rounded-xl text-sm font-bold bg-teal-50 text-teal-800 border border-teal-200';
+        fb.textContent = '✅ 太棒了！這就是課本 P.50「STEP 3 & 4 凝結共識」：先同理對方想休息的需求，同時訂出明確時間與公平輪流規則！';
+      } else if (val === 'bad1') {
+        fb.className = 'mt-3 p-3.5 rounded-xl text-sm font-bold bg-rose-50 text-rose-800 border border-rose-200';
+        fb.textContent = '⚠️ 這是課本 P.48 的「侮辱與藐視」，只會讓孩子更生氣頂嘴喔！建議選中間那個雙贏方案試試看。';
+      } else {
+        fb.className = 'mt-3 p-3.5 rounded-xl text-sm font-bold bg-rose-50 text-rose-800 border border-rose-200';
+        fb.textContent = '⚠️ 這是課本 P.48 的「冷漠逃避」，問題沒解決反而讓關係結冰！建議選中間那個雙贏方案試試看。';
+      }
+    }
+
+    function completeStage2() {
+      const pWish = document.getElementById('swap-parent-wish').value.trim();
+      const kWish = document.getElementById('swap-kid-wish').value.trim();
+      const err = document.getElementById('stage2-error');
+
+      if (!studentState.flippedParent || !studentState.flippedKid || !studentState.commSelected || !pWish || !kWish) {
+        err.classList.remove('hidden');
+        return;
+      }
+      err.classList.add('hidden');
+      studentState.parentWish = pWish;
+      studentState.kidWish = kWish;
+      goToStage(3);
+    }
+
+    // ==================== 關卡三：家庭安全網實戰題 ====================
+    const safetyQuestions = [
+      {
+        q: "1.【新聞案例判斷｜課本 P.51】新聞報導：「一名男子常因為家人沒立刻回訊息就破口大罵、摔壞家人手機，甚至控制家人的零用錢不准花。」請問這屬於家庭暴力嗎？",
+        options: [
+          { text: "A. 不算，只要沒有動手打到流血就不算家暴", correct: false },
+          { text: "B. 算！這包含「言語虐待、心理虐待（摔物品威脅）與經濟控制」", correct: true },
+          { text: "C. 算，但只有夫妻之間才算，親子之間不算", correct: false }
+        ],
+        explanation: "解析（P.51）：家庭暴力包含身體、言語、心理、經濟控制與性虐待，摔東西威脅與過度控制金錢都屬於家暴！"
+      },
+      {
+        q: "2.【家暴自救四招｜課本 P.52】萬一在家中遇到家人情緒失控、即將動手施暴時，下列哪一個自救反應是「錯誤」的？",
+        options: [
+          { text: "A. 保持冷靜，不要用言語繼續激怒對方", correct: false },
+          { text: "B. 雙手護住頭部、臉部與頸部等要害，並找機會逃離現場", correct: false },
+          { text: "C. 拿家裡的東西跟對方互砸拼輸贏", correct: true }
+        ],
+        explanation: "解析（P.52）：自救四步驟為「保持冷靜、保護自己、大聲呼救、逃離現場」，硬碰硬只會讓自己受更嚴重的傷！"
+      },
+      {
+        q: "3.【守護者行動｜課本 P.53】晚上寫功課時，聽到隔壁鄰居家傳來劇烈摔東西與大聲求救的聲音，發揮「紫絲帶精神」的你應該怎麼做？",
+        options: [
+          { text: "A. 立刻撥打 110 報警或 113 保護專線通報，請警方與社工協助", correct: true },
+          { text: "B. 怕惹麻煩，假裝沒聽到把窗戶關起來", correct: false },
+          { text: "C. 自己一個人衝去按鄰居門鈴跟施暴者理論", correct: false }
+        ],
+        explanation: "解析（P.52–53）：紫絲帶精神強調「不做沉默的旁觀者」，但為了自身安全，應撥打 110 或 113 請公權力介入，切勿單獨硬闖！"
+      },
+      {
+        q: "4.【證據保全與保護令｜課本 P.53–54】若不幸發生家暴事件，為了向法院聲請「保護令」，下列哪一項證據「沒有」法律效力？",
+        options: [
+          { text: "A. 醫院開立的驗傷診斷書與受傷部位照片", correct: false },
+          { text: "B. 110 報案紀錄、現場錄音錄影與目擊證人", correct: false },
+          { text: "C. 事後自己在日記本寫的心情小語（無任何時間與客觀紀錄）", correct: true }
+        ],
+        explanation: "解析（P.53）：五大關鍵證據包含「報警紀錄、驗傷單、照片、錄音錄影、證人」，核發保護令後可禁止施暴者接觸或命其遷出住所！"
+      }
+    ];
+
+    const safetyAnswers = {};
+
+    function renderSafetyQuiz() {
+      const container = document.getElementById('safety-quiz-container');
+      container.innerHTML = safetyQuestions.map((item, idx) => `
+        <div class="p-5 rounded-2xl bg-stone-50 border border-stone-200">
+          <p class="font-bold text-slate-800 text-base sm:text-lg mb-3">${item.q}</p>
+          <div class="space-y-2">
+            ${item.options.map((opt, oIdx) => `
+              <button type="button" onclick="answerSafety(${idx}, ${oIdx}, ${opt.correct})" id="s3-btn-${idx}-${oIdx}"
+                class="w-full text-left p-3.5 rounded-xl bg-white border border-stone-200 hover:border-rose-400 transition text-sm sm:text-base text-slate-700 font-medium">
+                ${opt.text}
+              </button>
+            `).join('')}
+          </div>
+          <div id="s3-exp-${idx}" class="hidden mt-3 p-3 rounded-xl text-xs sm:text-sm font-bold"></div>
+        </div>
+      `).join('');
+    }
+    renderSafetyQuiz();
+
+    function answerSafety(qIdx, oIdx, isCorrect) {
+      safetyAnswers[qIdx] = isCorrect;
+      // 重設該題按鈕樣式
+      for (let i = 0; i < 3; i++) {
+        const btn = document.getElementById(`s3-btn-${qIdx}-${i}`);
+        btn.className = 'w-full text-left p-3.5 rounded-xl bg-white border border-stone-200 transition text-sm sm:text-base text-slate-700 font-medium';
+      }
+      const chosenBtn = document.getElementById(`s3-btn-${qIdx}-${oIdx}`);
+      const expBox = document.getElementById(`s3-exp-${qIdx}`);
+      expBox.classList.remove('hidden');
+
+      if (isCorrect) {
+        chosenBtn.className = 'w-full text-left p-3.5 rounded-xl bg-teal-50 border-2 border-teal-500 text-sm sm:text-base text-teal-900 font-bold';
+        expBox.className = 'mt-3 p-3 rounded-xl text-xs sm:text-sm font-bold bg-teal-100/70 text-teal-900';
+        expBox.textContent = '✅ 答對了！' + safetyQuestions[qIdx].explanation;
+      } else {
+        chosenBtn.className = 'w-full text-left p-3.5 rounded-xl bg-rose-50 border-2 border-rose-500 text-sm sm:text-base text-rose-900 font-bold';
+        expBox.className = 'mt-3 p-3 rounded-xl text-xs sm:text-sm font-bold bg-rose-100/70 text-rose-900';
+        expBox.textContent = '❌ 再想一下喔！' + safetyQuestions[qIdx].explanation;
+      }
+    }
+
+    function completeStage3() {
+      if (Object.keys(safetyAnswers).length < safetyQuestions.length) {
+        document.getElementById('stage3-error').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('stage3-error').classList.add('hidden');
+      let correctCount = 0;
+      Object.values(safetyAnswers).forEach(v => { if (v) correctCount++; });
+      studentState.safetyScore = correctCount * 25;
+      goToStage(4);
+    }
+
+    // ==================== 關卡四：行動選擇與成績憑證 ====================
+    function selectActionCategory(btn, catName) {
+      studentState.actionCategory = catName;
+      document.querySelectorAll('.action-cat-btn').forEach(b => {
+        b.className = 'action-cat-btn p-3 rounded-xl border border-stone-300 bg-white text-sm font-bold text-slate-700 hover:border-indigo-500 transition';
+      });
+      btn.className = 'action-cat-btn p-3 rounded-xl border-2 border-indigo-600 bg-indigo-600 text-sm font-bold text-white shadow-sm transition';
+    }
+
+    function generateCertificate() {
+      const actText = document.getElementById('final-action-text').value.trim();
+      const err = document.getElementById('stage4-error');
+      if (!studentState.actionCategory || !actText) {
+        err.classList.remove('hidden');
+        return;
+      }
+      err.classList.add('hidden');
+      studentState.actionText = actText;
+
+      // 填入憑證欄位
+      document.getElementById('cert-class').textContent = studentState.className;
+      document.getElementById('cert-seat').textContent = studentState.seat;
+      document.getElementById('cert-name').textContent = studentState.name;
+      document.getElementById('cert-animal').textContent = studentState.animalTitle;
+      document.getElementById('cert-safety-score').textContent = `${studentState.safetyScore} 分（守護者認證完成）`;
+      document.getElementById('cert-parent-wish').textContent = studentState.parentWish;
+      document.getElementById('cert-kid-wish').textContent = studentState.kidWish;
+      document.getElementById('cert-action-cat').textContent = studentState.actionCategory;
+      document.getElementById('cert-action-text').textContent = studentState.actionText;
+
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      document.getElementById('cert-timestamp').textContent = timeStr;
+
+      const cert = document.getElementById('certificate-card');
+      cert.classList.remove('hidden');
+      cert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  </script>
+</body>
+</html>
